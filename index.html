@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, user-scalable=no
+		initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>Door Lock</title>
+
+	<style>
+		@import 'ui/css/evothings-app.css';
+	</style>
+
+	<script>
+	// Redirect console.log to Evothings Workbench.
+	if (window.hyper && window.hyper.log) { console.log = hyper.log }
+	window.onerror = function(msg, url, line)
+	{
+		console.log(msg + ": " + url + ":" + line)
+	}
+	</script>
+
+	<script src="cordova.js"></script>
+	<script src="libs/jquery/jquery.js"></script>
+	<script src="libs/evothings/evothings.js"></script>
+	<script src="libs/evothings/arduinoble/arduinoble.js"></script>
+
+</head>
+
+<body ontouchstart="">
+
+	<h1>HERLOCKED</h1>
+
+	<p id="info">Initializing...</p>
+
+	<button class="yellow wide" onclick="app.connect()">CONNECT</button>
+
+	<br />
+
+	<button class="green wide big" onclick="app.ledOn()">LOCK</button>
+
+	<br />
+
+	<button class="red wide big" onclick="app.ledOff()">UNLOCK</button>
+
+	<script>
+	// Application object.
+	var app = {}
+
+	// Connected device.
+	app.device = null
+
+	// Turn on LED.
+	app.ledOn = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([1]))
+	}
+
+	// Turn off LED.
+	app.ledOff = function()
+	{
+		app.device && app.device.writeDataArray(new Uint8Array([0]))
+	}
+
+	app.showMessage = function(info)
+	{
+		document.getElementById('info').innerHTML = info
+	}
+
+	// Called when BLE and other native functions are available.
+	app.onDeviceReady = function()
+	{
+		app.showMessage('Touch the connect button to begin.')
+	}
+
+	app.connect = function()
+	{
+		evothings.arduinoble.close()
+		evothings.arduinoble.connect(
+			'BLE Shield', // Name of BLE shield.
+			function(device)
+			{
+				app.device = device
+				app.showMessage('Connected! Touch buttons to lock/unlock door.')
+			},
+			function(errorCode)
+			{
+				app.showMessage('Connect error: ' + errorCode + '.')
+			})
+	}
+
+	document.addEventListener('deviceready', app.onDeviceReady, false)
+	</script>
+
+	<img src="https://s-media-cache-ak0.pinimg.com/originals/63/5e/47/635e47eb7a073ae3d1d41e84689daf89.jpg" alt="HELP" width=200 height =200>
+
+</body>
+
+</html>
